@@ -58,20 +58,6 @@ RUN docker-php-ext-install \
     && pecl install imagick \
     && docker-php-ext-enable imagick
 
-RUN echo "memory_limit=-1" > $PHP_INI_DIR/conf.d/memory-limit.ini \
-    && echo "date.timezone=Europe/Warsaw" > $PHP_INI_DIR/conf.d/date_timezone.ini
-
-# NodeJS
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get clean
-
-# Yarn
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-    && apt-get update \
-    && apt-get install yarn \
-    && apt-get clean
 
 VOLUME /root/composer
 
@@ -84,12 +70,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 WORKDIR /tmp
 
 # Run phpunit installation
-RUN composer require "phpunit/phpunit=7.*" --prefer-source --no-interaction \
-    && ln -s /tmp/vendor/bin/phpunit /usr/local/bin/phpunit
+RUN composer install
 
-# Run codesniffer installation
-RUN composer require "squizlabs/php_codesniffer=*" --prefer-source --no-interaction \
-    && ln -s /tmp/vendor/bin/phpcs /usr/local/bin/phpcs
 
 RUN php --version \
     && composer --version \
